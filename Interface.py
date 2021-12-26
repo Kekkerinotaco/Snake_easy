@@ -2,17 +2,11 @@
 import random
 from tkinter import Tk, Canvas
 
-window = Tk()
-window.title("KrasNIPI in collaboration with GPN snake game for $1000000000")
 
 WIDTH = 800
 HEIGHT = 600
 SEG_SIZE = 20
 IN_GAME = True
-
-c = Canvas(window, width=WIDTH, height=HEIGHT, bg="#555555")
-c.grid()
-c.focus_set()
 
 
 # Класс сегмента змейки, один ее кусок, будет использоваться для конструирования змеи
@@ -42,7 +36,7 @@ class Snake(object):
         # ??? Насколько я понял, присваивает каждому текущему сегменту позицию следующего
         for segment in range(len(self.segments) - 1):
             current_segment = self.segments[segment].instance
-            x1, y1, x2, y2 = c.coords(self.segments[segment+1].instanse)
+            x1, y1, x2, y2 = c.coords(self.segments[segment+1].instance)
             c.coords(current_segment, x1, y1, x2, y2)
 
         # ??? Вроде в методе выше мы математически задали перемещение змеи, а здесь переносим его
@@ -71,7 +65,7 @@ class Snake(object):
         self.segments.insert(0, Segment(x, y))
 
 
-def apple():
+def create_apple():
     """ Создает яблоко в случайной позиции на карте """
     global APPLE
     posx = SEG_SIZE * (random.randint(1, (WIDTH - SEG_SIZE) / SEG_SIZE))
@@ -83,11 +77,65 @@ def apple():
                           fill="red")
 
 
-segments = [
-            Segment(SEG_SIZE, SEG_SIZE),
-            Segment(SEG_SIZE*2, SEG_SIZE),
-            Segment(SEG_SIZE*3, SEG_SIZE),
-            ]
+def main():
+    global IN_GAME
 
-s = Snake(segments)
+    if IN_GAME:
+        # Двигаем змейку
+        s.move()
+
+        # Определяем координаты головы
+        head_coords = c.coords(s.segments[-1].instance)
+        x1, y1, x2, y2 = head_coords
+
+        # Столкновение с границами экрана
+        if x1 < 0 or x2 > WIDTH or y1 < 0 or y2 > HEIGHT:
+            IN_GAME = False
+
+        # Поедание яблок
+        elif head_coords == c.coords(APPLE):
+            s.add_segment()
+            c.delete(APPLE)
+            create_apple()
+
+        # Самоедство
+        else:
+            # Проходим по всем сегментам змеи
+            for index in range(len(s.segments) - 1):
+                if c.coords(s.segments[index].instance) == head_coords:
+                    IN_GAME = False
+
+    # Если не в игре выводим сообщение о проигрыше
+    else:
+        c.create_text(WIDTH / 2, HEIGHT / 2,
+                      text="GAME OVER!",
+                      font="Arial 20",
+                      fill="#ff0000")
+
+
+def create_snake():
+    segments = [
+        Segment(SEG_SIZE, SEG_SIZE),
+        Segment(SEG_SIZE * 2, SEG_SIZE),
+        Segment(SEG_SIZE * 3, SEG_SIZE),
+    ]
+    return Snake(segments)
+
+
+def start_game():
+    global s
+    create_apple()
+    s = create_snake()
+    c.bind("<KeyPress>", s.change_direction)
+    main()
+
+
+window = Tk()
+window.title("KrasNIPI in collaboration with GPN snake game for $1000000000")
+
+c = Canvas(window, width=WIDTH, height=HEIGHT, bg="#555555")
+c.grid()
+c.focus_set()
+
+start_game()
 window.mainloop()
