@@ -1,6 +1,6 @@
 # Creating the interface
-
-from tkinter import *
+import random
+from tkinter import Tk, Canvas
 
 window = Tk()
 window.title("KrasNIPI in collaboration with GPN snake game for $1000000000")
@@ -69,6 +69,18 @@ class Snake(object):
         y = last_seg[3] - SEG_SIZE
 
         self.segments.insert(0, Segment(x, y))
+
+
+def apple():
+    """ Создает яблоко в случайной позиции на карте """
+    global APPLE
+    posx = SEG_SIZE * (random.randint(1, (WIDTH - SEG_SIZE) / SEG_SIZE))
+    posy = SEG_SIZE * (random.randint(1, (HEIGHT - SEG_SIZE) / SEG_SIZE))
+
+    APPLE = c.create_oval(posx, posy,
+                          posx + SEG_SIZE,
+                          posy + SEG_SIZE,
+                          fill="red")
 
 
 segments = [
