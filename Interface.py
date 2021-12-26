@@ -26,7 +26,7 @@ class Snake(object):
                         "Down": (0, 1),
                         "Up": (0, -1),
                         "Left": (-1, 0),
-                        "Right": (0, -1)
+                        "Right": (1, 0)
                         }
 
         self.vector = self.mapping["Right"]
@@ -42,7 +42,7 @@ class Snake(object):
         # ??? Вроде в методе выше мы математически задали перемещение змеи, а здесь переносим его
         # ??? графически на объект Canvas
         c.coords(self.segments[-1].instance,
-                x1 + self.vector[0]*SEG_SIZE,
+                x1 + self.vector[0] * SEG_SIZE,
                 y1 + self.vector[1] * SEG_SIZE,
                 x2 + self.vector[0] * SEG_SIZE,
                 y2 + self.vector[1] * SEG_SIZE
@@ -105,6 +105,8 @@ def main():
                 if c.coords(s.segments[index].instance) == head_coords:
                     IN_GAME = False
 
+        # magic строка из-за которой всё работает
+        window.after(100, main)
     # Если не в игре выводим сообщение о проигрыше
     else:
         c.create_text(WIDTH / 2, HEIGHT / 2,
